@@ -307,7 +307,14 @@ export default function ArtifactCode() {
         @media print {
           body { background: white; }
           .no-print { display: none !important; }
-          @page { margin: 1cm; }
+          @page { margin: 0.5cm; }
+          #printable-receipt { 
+            zoom: 0.85; 
+            margin: 0 auto !important; 
+            border: none !important; 
+            box-shadow: none !important;
+            page-break-inside: avoid;
+          }
         }
         @keyframes laser { 0%{top:0} 50%{top:96%} 100%{top:0} }
         .animate-laser { animation: laser 2s ease-in-out infinite; }
@@ -320,17 +327,12 @@ export default function ArtifactCode() {
           <div className="relative w-full h-[650px] flex items-center justify-center bg-[#0a2315] overflow-hidden">
             {/* Background Image / Overlay */}
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1580519542036-ed4742589d12?q=80&w=2000')] bg-cover bg-center opacity-30 mix-blend-luminosity" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0a2315]/90 to-[#0d3b20]/90" />
-            </div>
-
-            {/* Huge Background Text */}
-            <div className="absolute top-10 w-full text-center pointer-events-none opacity-20">
-              <h1 className="text-8xl md:text-[120px] font-black text-[#d4af37]" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
+              <div className="absolute inset-0 bg-[url('/bg-passport.png')] bg-cover bg-center" />
+              <div className="absolute inset-0 bg-[#0d3b20]/60 mix-blend-multiply" />
             </div>
 
             {/* Modal Box */}
-            <div className="relative z-10 bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center">
+            <div className="relative z-10 bg-black/40 backdrop-blur-md border border-white/20 p-10 rounded-3xl shadow-2xl flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center mt-10">
               <Plane className="w-14 h-14 text-amber-400" />
               <div>
                 <h1 className="text-3xl font-black text-white italic tracking-widest mb-1" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
