@@ -56,8 +56,8 @@ const CROSSING_ICON = { "جوي": Plane, "بحري": Ship, "بري": Truck };
 const emptyPassport = () => ({ file: null, preview: null, verified: false, scanning: false, progress: 0, data: { passportNo: "", fullNameAr: "", fullNameFr: "", birthDate: "", expiryDate: "", issuedBy: "", gender: "M" } });
 
 export default function ArtifactCode() {
-  // Steps: 'type' | 'auth' | 'passport' | 'crossing' | 'payment' | 'receipt'
-  const [step, setStep] = useState("type");
+  // Steps: 'home' | 'type' | 'auth' | 'passport' | 'crossing' | 'payment' | 'receipt'
+  const [step, setStep] = useState("home");
 
   // Request type: 'individual' | 'family'
   const [requestType, setRequestType] = useState(null);
@@ -159,7 +159,7 @@ export default function ArtifactCode() {
 
   const getGrantEUR = (birthDate) => getAge(birthDate) >= 19 ? 750 : 300;
   const getGrantDZD = (birthDate) => parseFloat((getGrantEUR(birthDate) * eurRate).toFixed(2));
-  const COMMISSION = 1000.00;
+  const COMMISSION = 1190.00;
 
   // Passport upload
   const handleFileUpload = (idx, e) => {
@@ -304,38 +304,76 @@ export default function ArtifactCode() {
     <div className="w-full max-w-5xl mx-auto px-4 py-6 relative" style={{ fontFamily: "'Cairo', sans-serif" }}>
       <Toaster position="top-center" richColors />
       <style dangerouslySetInnerHTML={{ __html: `
-        @media print { body * { visibility:hidden } #printable-receipt,#printable-receipt * { visibility:visible } #printable-receipt { position:absolute;left:0;top:0;width:100% } .no-print{display:none!important} }
+        @media print {
+          body { background: white; }
+          .no-print { display: none !important; }
+          @page { margin: 1cm; }
+        }
         @keyframes laser { 0%{top:0} 50%{top:96%} 100%{top:0} }
         .animate-laser { animation: laser 2s ease-in-out infinite; }
       `}} />
 
-      <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl overflow-hidden no-print">
-        {/* Header */}
-        <div className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-7 text-center">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:3rem_3rem]" />
-          <div className="relative z-10">
-            <h1 className="text-4xl font-black tracking-wider mb-1" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
-            <p className="text-blue-200 text-sm font-bold">طلب منحة السفر — Droit de change pour voyage à l'étranger</p>
+      <div className="bg-white border border-slate-200 shadow-2xl rounded-3xl overflow-hidden">
+        
+        {/* Landing Page */}
+        {step === "home" && (
+          <div className="relative w-full h-[650px] flex items-center justify-center bg-[#0a2315] overflow-hidden">
+            {/* Background Image / Overlay */}
+            <div className="absolute inset-0">
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1580519542036-ed4742589d12?q=80&w=2000')] bg-cover bg-center opacity-30 mix-blend-luminosity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0a2315]/90 to-[#0d3b20]/90" />
+            </div>
+
+            {/* Huge Background Text */}
+            <div className="absolute top-10 w-full text-center pointer-events-none opacity-20">
+              <h1 className="text-8xl md:text-[120px] font-black text-[#d4af37]" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
+            </div>
+
+            {/* Modal Box */}
+            <div className="relative z-10 bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl flex flex-col items-center gap-6 max-w-sm w-full mx-4 text-center">
+              <Plane className="w-14 h-14 text-amber-400" />
+              <div>
+                <h1 className="text-3xl font-black text-white italic tracking-widest mb-1" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
+                <p className="text-[10px] font-bold text-white tracking-widest">PREMIUM TRAVEL GRANT PORTAL</p>
+              </div>
+              <button onClick={() => setStep("type")} className="w-full mt-4 bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-lg py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all hover:scale-105 shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                طلب منحة السفر
+                <Plane className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Header */}
+        {step !== "home" && (
+          <div className="relative bg-[#1e3a8a] text-white p-6 text-center no-print border-b-4 border-amber-400">
+            <div className="relative z-10 flex items-center justify-center gap-3">
+              <h1 className="text-4xl font-black italic tracking-wider" style={{ fontFamily: "'Outfit',sans-serif" }}>X-CHANGE</h1>
+              <Plane className="w-10 h-10 text-amber-400" />
+            </div>
+          </div>
+        )}
 
         {/* Stepper */}
-        <div className="bg-slate-50 border-b px-4 py-4 flex items-center justify-between overflow-x-auto gap-1">
-          {STEPS.map((s, i) => (
-            <React.Fragment key={s.id}>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${stepIdx > i ? "bg-blue-600 border-blue-600 text-white" : stepIdx === i ? "bg-blue-800 border-blue-800 text-white ring-2 ring-blue-200" : "bg-white border-slate-200 text-slate-400"}`}>
-                  {stepIdx > i ? <Check className="w-3.5 h-3.5" /> : s.n}
+        {step !== "home" && (
+          <div className="bg-slate-50 border-b px-4 py-4 flex items-center justify-between overflow-x-auto gap-1 no-print">
+            {STEPS.map((s, i) => (
+              <React.Fragment key={s.id}>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${stepIdx > i ? "bg-blue-600 border-blue-600 text-white" : stepIdx === i ? "bg-blue-800 border-blue-800 text-white ring-2 ring-blue-200" : "bg-white border-slate-200 text-slate-400"}`}>
+                    {stepIdx > i ? <Check className="w-3.5 h-3.5" /> : s.n}
+                  </div>
+                  <span className={`text-xs font-semibold ${stepIdx === i ? "text-slate-900" : stepIdx > i ? "text-blue-600" : "text-slate-400"}`}>{s.label}</span>
                 </div>
-                <span className={`text-xs font-semibold ${stepIdx === i ? "text-slate-900" : stepIdx > i ? "text-blue-600" : "text-slate-400"}`}>{s.label}</span>
-              </div>
-              {i < STEPS.length - 1 && <div className={`h-[2px] flex-grow mx-2 rounded ${stepIdx > i ? "bg-blue-600" : "bg-slate-200"}`} />}
-            </React.Fragment>
-          ))}
-        </div>
+                {i < STEPS.length - 1 && <div className={`h-[2px] flex-grow mx-2 rounded ${stepIdx > i ? "bg-blue-600" : "bg-slate-200"}`} />}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
 
-        <div className="p-6 md:p-8">
-
+        {step !== "home" && (
+          <div className="p-6 md:p-8">
+            {/* The rest of the steps ... */}
           {/* STEP: TYPE */}
           {step === "type" && (
             <div className="max-w-lg mx-auto space-y-6">
@@ -608,7 +646,7 @@ export default function ArtifactCode() {
             const rpRef = receiptRefs[viewingReceipt] || "";
             return (
             <div className="space-y-6">
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center max-w-xl mx-auto">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center max-w-xl mx-auto no-print">
                 <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
                 <h2 className="text-lg font-black text-emerald-950">تم إصدار الوصل بنجاح!</h2>
                 <p className="text-emerald-800 text-sm">يمكنك طباعة الوصل أو حفظه كملف PDF — وصل لكل فرد على حدة</p>
@@ -616,7 +654,7 @@ export default function ArtifactCode() {
 
               {/* Person tabs (for family) */}
               {passports.length > 1 && (
-                <div className="flex gap-2 justify-center flex-wrap">
+                <div className="flex gap-2 justify-center flex-wrap no-print">
                   {passports.map((_, i) => (
                     <button key={i} onClick={() => setViewingReceipt(i)} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${viewingReceipt === i ? "bg-blue-800 text-white shadow-md" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
                       وصل {labels[i]}
@@ -684,7 +722,8 @@ export default function ArtifactCode() {
             );
           })()}
 
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
